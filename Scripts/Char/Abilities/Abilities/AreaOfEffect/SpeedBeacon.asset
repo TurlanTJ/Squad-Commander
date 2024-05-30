@@ -13,15 +13,12 @@ MonoBehaviour:
   m_Name: SpeedBeacon
   m_EditorClassIdentifier: 
   name: SpeedBeacon
+  energyCost: 0
   abilityRange: 10
   activeTime: 0
   cooldownTime: 5
-  affect:
-  - serializedVersion: 2
-    m_Bits: 64
-  requiredLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  affect: 00000000
+  requiredLayer: 1
   effect: 0
   areaRadius: 20
   areaGrowthRate: 15

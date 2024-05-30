@@ -22,6 +22,4 @@ MonoBehaviour:
   unitDamage: 30
   unitArmor: 0.4
   unitIcon: {fileID: 0}
-  targetLayerMask:
-    serializedVersion: 2
-    m_Bits: 256
+  targetLayerMask: 1

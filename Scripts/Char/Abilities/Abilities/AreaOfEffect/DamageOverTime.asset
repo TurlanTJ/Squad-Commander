@@ -13,19 +13,14 @@ MonoBehaviour:
   m_Name: DamageOverTime
   m_EditorClassIdentifier: 
   name: DamageOverTime
+  energyCost: 0
   abilityRange: 10
   activeTime: 0
   cooldownTime: 10
-  affect:
-  - serializedVersion: 2
-    m_Bits: 256
-  - serializedVersion: 2
-    m_Bits: 64
-  requiredLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  affect: 0100000000000000
+  requiredLayer: 1
   effect: 4
-  areaRadius: 20
+  areaRadius: 10
   areaGrowthRate: 20
   abilityDuration: 10
   modifier: 50

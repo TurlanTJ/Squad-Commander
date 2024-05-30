@@ -14,6 +14,7 @@ public class UnitManager : MonoBehaviour
 
     [SerializeField] private List<GameObject> _availableUnits = new List<GameObject>();
     [SerializeField] private List<GameObject> spawnedUnits = new List<GameObject>();
+    [SerializeField] private List<IUnit> aliveUnits = new List<IUnit>();
 
     private List<Vector3> unitSpawnPositions = new List<Vector3>();
 
@@ -48,6 +49,9 @@ public class UnitManager : MonoBehaviour
             {
                 GameObject u = Instantiate(unit, spawnPos, Quaternion.identity);
                 spawnedUnits.Add(u);
+                IUnit unitScript = u.GetComponent<IUnit>();
+                aliveUnits.Add(unitScript);
+                unitScript.onUnitDeath += RemoveDeadUnit;
                 u.GetComponent<Unit>().SetUnitOrder(_availableUnits.IndexOf(unit) + 1);
 
                 unitSpawnPositions.Remove(spawnPos);
@@ -57,6 +61,13 @@ public class UnitManager : MonoBehaviour
 
         unitSelectionManager.spawnedUnits = spawnedUnits;
         onUnitSpawn?.Invoke(spawnedUnits);
+    }
+
+    public void RemoveDeadUnit(IUnit deadUnit)
+    {
+        aliveUnits.Remove(deadUnit);
+        if(aliveUnits.Count <= 0)
+            LevelObjective.instance.OpenLevelClearPanel(true);
     }
 
     public List<GameObject> GetSpawnedUnits()

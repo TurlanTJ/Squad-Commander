@@ -16,6 +16,9 @@ public class Enemy : IUnit
 
     void Update()
     {
+        if(isStunned)
+            StopAllUnitActions();
+
         if(currentTarget == null || !currentTarget.GetComponent<IUnit>().isAlive)
         {
             availableTargets.Remove(currentTarget);

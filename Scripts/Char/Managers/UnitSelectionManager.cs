@@ -56,6 +56,12 @@ public class UnitSelectionManager : MonoBehaviour
             if(unit.GetComponent<Unit>().isFocused)
                 unit.GetComponent<Unit>().SetUnitFocusStatus(false);
         }
+
+        if(focusedUnit != null)
+        {
+            focusedUnit.GetComponent<Unit>().unitAbilityManager.UnDrawAoEArea();
+            focusedUnit.GetComponent<Unit>().unitAbilityManager.UnDrawAbilityRange();
+        }
         focusedUnit = null;
         selectedUnits.Clear();
         PlayerManager.instance.isGivingCommand = false;
@@ -82,22 +88,26 @@ public class UnitSelectionManager : MonoBehaviour
 
     public void FocusOnFirstUnit(InputAction.CallbackContext context)
     {
-        FocusOnUnit(spawnedUnits[0].GetComponent<Unit>().unitOrder);
+        if(spawnedUnits[0] != null)
+            FocusOnUnit(spawnedUnits[0].GetComponent<Unit>().unitOrder);
     }
 
     public void FocusOnSecondUnit(InputAction.CallbackContext context)
     {
-        FocusOnUnit(spawnedUnits[1].GetComponent<Unit>().unitOrder);
+        if(spawnedUnits[1] != null)
+            FocusOnUnit(spawnedUnits[1].GetComponent<Unit>().unitOrder);
     }
 
     public void FocusOnThirdUnit(InputAction.CallbackContext context)
     {
-        FocusOnUnit(spawnedUnits[2].GetComponent<Unit>().unitOrder);
+        if(spawnedUnits[2] != null)
+            FocusOnUnit(spawnedUnits[2].GetComponent<Unit>().unitOrder);
     }
 
     public void FocusOnFourthUnit(InputAction.CallbackContext context)
     {
-        FocusOnUnit(spawnedUnits[3].GetComponent<Unit>().unitOrder);
+        if(spawnedUnits[3] != null)
+            FocusOnUnit(spawnedUnits[3].GetComponent<Unit>().unitOrder);
     }
 
     public void FocusOnUnit(int unitOrder)

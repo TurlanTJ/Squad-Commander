@@ -17,18 +17,12 @@ MonoBehaviour:
   abilityRange: 10
   activeTime: 0
   cooldownTime: 5
-  affect:
-  - serializedVersion: 2
-    m_Bits: 256
-  - serializedVersion: 2
-    m_Bits: 64
-  requiredLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  affect: 0000000001000000
+  requiredLayer: 1
   effect: 5
   areaRadius: 10
   areaGrowthRate: 20
-  abilityDuration: 2
+  abilityDuration: 1
   modifier: 1
-  modifierDuration: 5
+  modifierDuration: 3
   buffAreaSpawner: {fileID: 1400312868237687084, guid: 5004292409623784aa199713efc133a7, type: 3}

@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 public class Unit : IUnit
 {
-    public UnitAbilityManager unitAbility;
+    public UnitAbilityManager unitAbilityManager;
 
     public int unitOrder;
     public bool isSelected = false;
@@ -35,6 +35,9 @@ public class Unit : IUnit
 
     void Update()
     {
+        if(isStunned)
+            StopAllUnitActions();
+
         // Movement Check
         if(!unitAgent.pathPending)
         {

@@ -16,5 +16,5 @@ public class UnitSO : ScriptableObject
     public float unitArmor;
 
     public Sprite unitIcon;
-    public LayerMask targetLayerMask;
+    public UnitFaction targetLayerMask;
 }

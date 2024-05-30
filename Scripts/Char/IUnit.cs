@@ -17,6 +17,8 @@ public class IUnit : MonoBehaviour
     public float defaultSpeed;
     public float attackDelay;
 
+    public UnitFaction unitFaction;
+
     public NavMeshAgent unitAgent;
     public UnitStance unitStanceCurrent;
 
@@ -33,7 +35,7 @@ public class IUnit : MonoBehaviour
     public OnUnitHealthChange onUnitHealthChange;
     public delegate void OnUnitEnergyChange(int currentHealth);
     public OnUnitEnergyChange onUnitEnergyChange;
-    public delegate void OnUnitDeath();
+    public delegate void OnUnitDeath(IUnit unit);
     public OnUnitDeath onUnitDeath;
 
     public void StopAllUnitActions()
@@ -104,13 +106,14 @@ public class IUnit : MonoBehaviour
             return;
 
         // Spawn Bullets
-        Debug.Log("Fire");
+        Debug.Log($"{unitData.unitName} dealt {unitData.unitDamage}");
 
         if(currentTarget.TryGetComponent(out IUnit unitTarget))
+        {
+            if(unitTarget.unitHealthCurrent - unitData.unitDamage <= 0)
+                availableTargets.Remove(currentTarget);
             unitTarget.TakeDamage(unitData.unitDamage);
-
-        if(currentTarget.TryGetComponent(out Dummy dummy))
-            dummy.TakeDamage(unitData.unitDamage);
+        }
 
         onUnitAttack?.Invoke(true);
     }
@@ -133,7 +136,7 @@ public class IUnit : MonoBehaviour
     }
 
     // Take Damage While Considering Damage-Reduction Logic
-    public void TakeDamage(int damage)
+    public virtual void TakeDamage(int damage)
     {
         int finalDmg = damage;
 
@@ -142,9 +145,10 @@ public class IUnit : MonoBehaviour
             if(unitData.unitArmor > 1)
                 finalDmg = 0;
             else
-                finalDmg = Mathf.RoundToInt(damage * (1 - unitData.unitArmor)/2);
+                finalDmg = Mathf.RoundToInt(damage * (1 - unitData.unitArmor));
         }
         unitStanceCurrent = UnitStance.Combat;
+        Debug.Log($"{unitData.unitName} recieved {finalDmg}; Damage is reduced by {(unitData.unitArmor * 100)}% due to Unit Armor");
         UpdateCurrentHealth(-finalDmg);
     }
 
@@ -221,7 +225,7 @@ public class IUnit : MonoBehaviour
     {
         // Death-related functions
 
-        onUnitDeath?.Invoke();
+        onUnitDeath?.Invoke(this);
         isAlive = false;
 
         gameObject.SetActive(false);
@@ -233,4 +237,16 @@ public enum UnitStance
     Idle,
     Combat,
     Busy
+}
+
+public enum UnitFaction
+{
+    Friendly,
+    Enemy
+}
+
+public enum InteractableType
+{
+    Unit,
+    Ground
 }

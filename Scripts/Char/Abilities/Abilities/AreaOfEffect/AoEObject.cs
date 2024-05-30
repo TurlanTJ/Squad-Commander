@@ -13,12 +13,12 @@ public class AoEObject : MonoBehaviour
     private bool AoEActive = false;
 
     private EffectType AoEType;
-    private List<LayerMask> affectLayers;
+    private List<UnitFaction> affectLayers;
     private List<IUnit> unitsInArea = new List<IUnit>();
     private AbilitySO AoESpawner;
 
     public void Initialize(AbilitySO spawner, float areaRad, float growthRate, float duration,
-         float modifier, float modifierDuration, EffectType effect, List<LayerMask>  affect)
+         float modifier, float modifierDuration, EffectType effect, List<UnitFaction>  affect)
     {
         AoERadius = areaRad;
         AoEDuration = duration;
@@ -35,19 +35,19 @@ public class AoEObject : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        foreach(LayerMask affectLayer in affectLayers)
+        if(other.gameObject.TryGetComponent(out IUnit unit))
         {
-            if(affectLayer== (affectLayer | (1 << other.gameObject.layer)))
-                unitsInArea.Add(other.gameObject.GetComponent<IUnit>());
+            if(affectLayers.Contains(unit.unitFaction))
+                unitsInArea.Add(unit); 
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        foreach(LayerMask affectLayer in affectLayers)
+        if(other.gameObject.TryGetComponent(out IUnit unit))
         {
-            if(affectLayer== (affectLayer | (1 << other.gameObject.layer)))
-                unitsInArea.Remove(other.gameObject.GetComponent<IUnit>());
+            if(affectLayers.Contains(unit.unitFaction))
+                unitsInArea.Remove(unit); 
         }
     }
 
@@ -71,7 +71,7 @@ public class AoEObject : MonoBehaviour
     private IEnumerator StartAbility()
     {
         float remainingTime = AoEDuration;
-        StartCoroutine(ApplyEffect())
+        StartCoroutine(ApplyEffect());
         
         while(remainingTime > 0)
         {
@@ -84,7 +84,8 @@ public class AoEObject : MonoBehaviour
 
     private IEnumerator ApplyEffect()
     {
-	AoEActive = true;
+        AoEActive = true;
+
         while(AoEActive)
         {
             switch(AoEType)
@@ -234,7 +235,7 @@ public class AoEObject : MonoBehaviour
 
         foreach(IUnit unit in unitsInArea)
         {
-            GameObject effect = new GameObject("SpeedBuff " + UnityEngine.Random.Range(0, 1000), typeof(Stun));
+            GameObject effect = new GameObject("Stun " + UnityEngine.Random.Range(0, 1000), typeof(Stun));
             effect.transform.SetParent(unit.gameObject.transform);
             Stun buff = effect.GetComponent<Stun>();
 
@@ -245,7 +246,7 @@ public class AoEObject : MonoBehaviour
                 for(var i = 0; i < unit.appliedEffects.Count; i++)
                 {
                     if(unit.appliedEffects[i].appliedBy == AoESpawner)
-                        return;
+                        buff.ResetTimer();
                 }
                 buff.InitializeEffect(unit, AoESpawner, AoEEffecDuration, AoEModifier);
             }

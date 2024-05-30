@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Dummy : MonoBehaviour
+public class Dummy : IUnit
 {
-    public void TakeDamage(int damage)
-    {
-        Debug.Log(damage);
-    }
+	public override void TakeDamage(int damage)
+	{
+		Debug.Log($"{unitData.unitName} recieved {damage}");
+	}
 }

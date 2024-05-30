@@ -63,6 +63,13 @@ public class UnitCommandManager : MonoBehaviour
 
     private IEnumerator UseAbility(GameObject unit)
     {
+        Unit focusedUnit = unit.GetComponent<Unit>();
+
+        focusedUnit.unitAbilityManager.DrawAbility(); // Drawing the ability Range
+        focusedUnit.unitAbilityManager.DrawAoEArea(); // Drawing the ability Location
+        GameObject abilityLoc = focusedUnit.unitAbilityManager.abilityLoc;
+
+
         playerManager.isGivingCommand = true;
 
         while(playerManager.isGivingCommand)
@@ -72,23 +79,49 @@ public class UnitCommandManager : MonoBehaviour
             if(Input.GetMouseButtonDown(0))
                 break;
 
+
             while (!Input.GetMouseButtonDown(1))
             {
+                // Updating the ability location
+                Ray newRay = mainCamera.ScreenPointToRay(Input.mousePosition);
+                if(Physics.Raycast(newRay, out RaycastHit newHit, Mathf.Infinity))
+                {
+                    if(newHit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                    {
+                        if(interactable.interactableType == InteractableType.Ground && abilityLoc != null)
+                        {
+                            Vector3 mousePosition = newHit.point;
+                            Vector3 dir = mousePosition - unit.transform.position;
 
+                            // checking if the area location is within the ability range
+                            if(dir.magnitude > focusedUnit.unitAbilityManager.unitAbility.abilityRange)
+                                mousePosition = unit.transform.position + dir.normalized * focusedUnit.unitAbilityManager.unitAbility.abilityRange;
+
+                            abilityLoc.transform.position = mousePosition;
+                        }
+                    }
+                }
+                 
                 yield return null;
             }
 
+
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, 
-                    unit.GetComponent<Unit>().unitAbility.unitAbility.requiredLayer))
+            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
             {
-                unit.GetComponent<Unit>().unitAbility.UseAbility(hit.collider.gameObject, hit.point);
+                if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    if(interactable.interactableType == focusedUnit.unitAbilityManager.unitAbility.requiredLayer && abilityLoc != null)
+                        focusedUnit.unitAbilityManager.UseAbility(hit.collider.gameObject, abilityLoc.transform.position); // Activating the ability
+                }
             }
 
             yield return null;
             break;
         }
-
+        
+        focusedUnit.unitAbilityManager.UnDrawAoEArea();
+        focusedUnit.unitAbilityManager.UnDrawAbilityRange();
         playerManager.isGivingCommand = false;
     }
 
@@ -107,8 +140,14 @@ public class UnitCommandManager : MonoBehaviour
                 yield return null;
 
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, unit.GetComponent<Unit>().unitData.targetLayerMask))
-                attackManager.InitiateAttack(unit, hit.collider.gameObject);
+            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            {
+                if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    if(interactable.interactableType == InteractableType.Unit && interactable.gameObject.GetComponent<IUnit>().unitFaction == UnitFaction.Enemy)
+                        attackManager.InitiateAttack(unit, hit.collider.gameObject);
+                }
+            }
             break;
         }
 
@@ -129,8 +168,14 @@ public class UnitCommandManager : MonoBehaviour
                 yield return null;
 
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, playerManager.layerGround))
-                movementManager.MoveSelectedUnits(unit, hit.point);
+            if(Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity))
+            {
+                if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    if(interactable.interactableType == InteractableType.Ground)
+                        movementManager.MoveSelectedUnits(unit, hit.point);
+                }
+            }
             break;
         }
 

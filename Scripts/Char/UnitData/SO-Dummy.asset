@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21dfcd51ebf836a4fbfa7d7ca7101446, type: 3}
-  m_Name: SO-Sniper
+  m_Name: SO-Dummy
   m_EditorClassIdentifier: 
-  unitId: 4
-  unitName: Sniper
-  unitDescription: Long range Unit with High Damage
-  unitHealthMax: 2500
-  unitEnergyMax: 200
-  unitRange: 20
-  unitAttackRPM: 30
-  unitDamage: 150
-  unitArmor: 0.4
+  unitId: 6
+  unitName: Dummy Target
+  unitDescription: Dummy Target
+  unitHealthMax: 99999
+  unitEnergyMax: 99999
+  unitRange: 0
+  unitAttackRPM: 0
+  unitDamage: 0
+  unitArmor: 1
   unitIcon: {fileID: 0}
   targetLayerMask: 1

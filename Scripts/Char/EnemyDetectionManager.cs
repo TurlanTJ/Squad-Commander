@@ -10,16 +10,32 @@ public class EnemyDetectionManager : MonoBehaviour
     {
         if(other.gameObject == unit.currentTarget)
             unit.StopMovement();
-        if(unit.unitData.targetLayerMask == (unit.unitData.targetLayerMask | (1 << other.gameObject.layer)))
-            unit.availableTargets.Add(other.gameObject);
+
+        if(other.gameObject.TryGetComponent(out IUnit unitScript))
+        {
+            if(unitScript.unitFaction != unit.unitData.targetLayerMask)
+                return;
+
+            if(!unit.availableTargets.Contains(unitScript.gameObject))
+                unit.availableTargets.Add(other.gameObject);
+        }
     }
 
     private void OnTriggerExit(Collider other)
     {
         if(other.gameObject == unit.currentTarget)
+        {
             unit.FollowTarget(unit.currentTarget);
+            return;
+        }
 
-        if(unit.unitData.targetLayerMask == (unit.unitData.targetLayerMask | (1 << other.gameObject.layer)))
-            unit.availableTargets.Remove(other.gameObject);
+        if(other.gameObject.TryGetComponent(out IUnit unitScript))
+        {
+            if(unitScript.unitFaction != unit.unitData.targetLayerMask)
+                return;
+                
+            if(unit.availableTargets.Contains(unitScript.gameObject))
+                unit.availableTargets.Remove(other.gameObject);
+        }
     }
 }

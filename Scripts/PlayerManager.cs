@@ -15,11 +15,6 @@ public class PlayerManager : MonoBehaviour
         instance = this;
     }
 
-    public LayerMask layerGround;
-    public LayerMask layerGameObjectInteractable;
-    public LayerMask layerUnitControllable;
-    public LayerMask layerUnitEnemy;
-
     public Vector3 mousePositionCurrent { get; private set; }
     public Vector3 mousePositionLeftClick { get; private set; }
     public Vector3 mousePositionRightClick { get; private set; }
@@ -34,7 +29,7 @@ public class PlayerManager : MonoBehaviour
     void Start()
     {
         mainCamera = Camera.main;
-        unitManager = UnitManager.instance;   
+        unitManager = UnitManager.instance;
     }
 
     // Update is called once per frame
@@ -46,9 +41,6 @@ public class PlayerManager : MonoBehaviour
         HanldeMouseHover();
         HandleSelection();
         HandleUnitCommand();
-
-        if(Input.GetKeyDown(KeyCode.Space))
-            unitManager.unitSelectionManager.focusedUnit.GetComponent<Unit>().TakeDamage(200);
     }
 
     public void HanldeMouseHover()
@@ -71,17 +63,25 @@ public class PlayerManager : MonoBehaviour
             RaycastHit hit;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-            if(Physics.Raycast(ray, out hit, Mathf.Infinity, layerUnitControllable))
+            if(Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                if(Input.GetKey(KeyCode.LeftShift))
-                    unitManager.SelectUnit(hit.collider.gameObject, true);
-                else
-                    unitManager.SelectUnit(hit.collider.gameObject, false);
-            }
-            else if(Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
-            {
-                if(unitManager.ContainsSelectedUnits())
-                    unitManager.DeselectUnit();
+                if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    InteractableType type = interactable.interactableType;
+
+                    if(type == InteractableType.Unit)
+                    {
+                        if(Input.GetKey(KeyCode.LeftShift))
+                            unitManager.SelectUnit(hit.collider.gameObject, true);
+                        else
+                            unitManager.SelectUnit(hit.collider.gameObject, false);
+                    }
+                    else if(type == InteractableType.Ground)
+                    {
+                        if(unitManager.ContainsSelectedUnits())
+                            unitManager.DeselectUnit();
+                    }
+                }
             }
         }
     }
@@ -98,15 +98,27 @@ public class PlayerManager : MonoBehaviour
             RaycastHit hit;
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
 
-            if(Physics.Raycast(ray, out hit, Mathf.Infinity, layerGround))
+            if(Physics.Raycast(ray, out hit, Mathf.Infinity))
             {
-                if(unitManager.unitSelectionManager.ContainsSelectedUnits())
-                    unitManager.unitCommandManager.movementManager.MoveSelectedUnits(hit.point);
-            }
-            if(Physics.Raycast(ray, out hit, Mathf.Infinity, layerUnitEnemy))
-            {
-                if(unitManager.unitSelectionManager.ContainsSelectedUnits())
-                    unitManager.unitCommandManager.attackManager.InitiateAttack(hit.collider.gameObject);
+                if(hit.collider.gameObject.TryGetComponent(out Interactable interactable))
+                {
+                    InteractableType type = interactable.interactableType;
+
+                    if(type == InteractableType.Ground)
+                    {
+                        if(unitManager.unitSelectionManager.ContainsSelectedUnits())
+                            unitManager.unitCommandManager.movementManager.MoveSelectedUnits(hit.point);
+                    }
+
+                    if(type == InteractableType.Unit)
+                    {
+                        if(interactable.gameObject.GetComponent<IUnit>().unitFaction == UnitFaction.Enemy)
+                        {
+                            if(unitManager.unitSelectionManager.ContainsSelectedUnits())
+                                unitManager.unitCommandManager.attackManager.InitiateAttack(interactable.gameObject);
+                        }
+                    }
+                }
             }
         }
     }

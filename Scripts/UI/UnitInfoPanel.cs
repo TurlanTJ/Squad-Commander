@@ -13,6 +13,7 @@ public class UnitInfoPanel : MonoBehaviour
     [SerializeField] private GameObject unitEnergyBarCurrent;
     [SerializeField] private GameObject unitEnergyBarCurrentText;
     [SerializeField] private GameObject unitIcon;
+    [SerializeField] private Image abilityCD;
 
     private UnitManager unitManager;
     private Unit unit;
@@ -38,6 +39,9 @@ public class UnitInfoPanel : MonoBehaviour
         unit.onUnitHealthChange += UpdateUnitHealth;
         unit.onUnitEnergyChange += UpdateUnitEnergy;
         unit.onUnitDeath +=  UpdateUnitDeathStatus;
+
+        unit.unitAbilityManager.onAbilityCDChanged += UpdateUIAbilityCD;
+        abilityCD.gameObject.SetActive(false);
 
         unitIcon.GetComponent<Image>().sprite = unit.unitData.unitIcon;
         unitHealthBarCurrentText.GetComponent<TextMeshProUGUI>().text = $"{unit.GetHealth().x} / {unit.GetHealth().y}";
@@ -73,10 +77,20 @@ public class UnitInfoPanel : MonoBehaviour
         unitEnergyBarCurrent.GetComponent<Image>().fillAmount = unitCurrentEnergy / (float)maxEnergy;
     }
 
-    public void UpdateUnitDeathStatus()
+    public void UpdateUnitDeathStatus(IUnit unit)
     {
         unitDeathPanel.SetActive(true);
         OpenPanel(false);
+    }
+
+    public void UpdateUIAbilityCD(float cd)
+    {
+        if(cd <= 0f)
+            abilityCD.gameObject.SetActive(false);
+        else
+            abilityCD.gameObject.SetActive(true);
+
+        abilityCD.fillAmount = cd;
     }
 
     public void UseAbility()

@@ -9,10 +9,11 @@ public class AbilitySO : ScriptableObject
     public float abilityRange;
     public float activeTime;
     public float cooldownTime;
-    public List<LayerMask> affect;
-    public LayerMask requiredLayer;
+    public List<UnitFaction> affect;
+    public InteractableType requiredLayer;
     public EffectType effect;
 
-    public virtual void DrawAbility(){}
+
+    public virtual GameObject DrawAbility(){return new GameObject();}
     public virtual void ActivateAbility(GameObject unit, GameObject target, Vector3 targetPos){}
 }
